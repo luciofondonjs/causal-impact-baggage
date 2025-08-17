@@ -280,7 +280,7 @@ ui <- dashboardPage(
                         
                         h4("📊 Gráfico Nativo - CausalImpact (Oficial)"),
                         p("Este es el gráfico estándar generado por la librería CausalImpact con 3 paneles: original, pointwise y cumulative."),
-                        plotOutput("native_causal_plot", height = "600px"),
+                        plotOutput("native_causal_plot"),
                         
                         br(),
                         
@@ -440,14 +440,20 @@ ui <- dashboardPage(
                     
                     br(),
                     
-                    h4("📝 Reporte Narrativo CausalImpact (Oficial)"),
-                    p("Este es el reporte automático generado por la librería CausalImpact:"),
-                    verbatimTextOutput("causal_impact_report"),
+                    h4("📊 Gráfico Nativo CausalImpact - Resumen"),
+                    p("Este es el gráfico estándar generado por la librería CausalImpact con 3 paneles: original, pointwise y cumulative."),
+                    plotOutput("native_summary_plot"),
                     
                     br(),
                     
-                    h4("📊 Gráfico Nativo CausalImpact - Resumen"),
-                    plotOutput("native_summary_plot", height = "500px"),
+                    h4("🔍 Debug Info (Verificar datos)"),
+                    verbatimTextOutput("debug_info"),
+                    
+                    br(),
+                    
+                    h4("📈 Reporte Narrativo CausalImpact (Oficial)"),
+                    p("Este es el reporte automático generado por la librería CausalImpact:"),
+                    verbatimTextOutput("causal_impact_report"),
                     
                     br(),
                     
@@ -462,6 +468,90 @@ ui <- dashboardPage(
                                      "📥 Descargar Reporte Completo (HTML)", 
                                      class = "btn-success btn-lg")
                     )
+                  )
+                ),
+                
+                # Nuevos insights y métricas
+                fluidRow(
+                  box(
+                    title = "📈 Métricas Clave del Impacto", 
+                    status = "info", 
+                    solidHeader = TRUE, 
+                    width = 6,
+                    
+                    h4("🎯 Efectos Principales"),
+                    tableOutput("key_impact_metrics"),
+                    
+                    br(),
+                    
+                    h4("📊 Significancia Estadística"),
+                    htmlOutput("statistical_significance"),
+                    
+                    br(),
+                    
+                    h4("💰 Impacto Financiero Estimado"),
+                    htmlOutput("financial_impact")
+                  ),
+                  
+                  box(
+                    title = "📊 Análisis de Tendencias", 
+                    status = "info", 
+                    solidHeader = TRUE, 
+                    width = 6,
+                    
+                    h4("📈 Tendencias Pre-Intervención"),
+                    plotlyOutput("pre_trend_plot", height = "200px"),
+                    
+                    br(),
+                    
+                    h4("📈 Tendencias Post-Intervención"),
+                    plotlyOutput("post_trend_plot", height = "200px")
+                  )
+                ),
+                
+                # Insights adicionales
+                fluidRow(
+                  box(
+                    title = "🔍 Insights Detallados", 
+                    status = "primary", 
+                    solidHeader = TRUE, 
+                    width = 12,
+                    
+                    h4("📋 Resumen Ejecutivo Estructurado"),
+                    htmlOutput("structured_summary"),
+                    
+                    br(),
+                    
+                    h4("🎯 Recomendaciones"),
+                    htmlOutput("recommendations"),
+                    
+                    br(),
+                    
+                    h4("⚠️ Limitaciones y Consideraciones"),
+                    htmlOutput("limitations")
+                  )
+                ),
+                
+                # Gráficos adicionales
+                fluidRow(
+                  box(
+                    title = "📊 Análisis de Estabilidad", 
+                    status = "warning", 
+                    solidHeader = TRUE, 
+                    width = 6,
+                    
+                    h4("📈 Estabilidad del Modelo"),
+                    plotlyOutput("model_stability_plot", height = "300px")
+                  ),
+                  
+                  box(
+                    title = "📊 Comparación de Períodos", 
+                    status = "warning", 
+                    solidHeader = TRUE, 
+                    width = 6,
+                    
+                    h4("📈 Comparación Pre vs Post"),
+                    plotlyOutput("period_comparison_plot", height = "300px")
                   )
                 )
               )
@@ -598,6 +688,8 @@ server <- function(input, output, session) {
       
       # Ejecutar Causal Impact
       alpha <- (100 - input$confidence_level) / 100
+      
+      # Versión simple y directa como estaba originalmente
       values$impact_results <- CausalImpact(data_zoo, pre.period, post.period, alpha = alpha)
       
       # Procesar resultados para visualización
@@ -632,6 +724,16 @@ server <- function(input, output, session) {
   })
   outputOptions(output, "analysis_complete", suspendWhenHidden = FALSE)
   
+  # Debug: Verificar que los resultados se generen correctamente
+  output$debug_info <- renderPrint({
+    req(values$impact_results)
+    cat("=== DEBUG INFO ===\n")
+    cat("Tipo de objeto impact_results:", class(values$impact_results), "\n")
+    cat("Estructura del objeto:\n")
+    str(values$impact_results, max.level = 2)
+    cat("=== FIN DEBUG ===\n")
+  })
+  
   # ==========================================
   # VISUALIZACIONES
   # ==========================================
@@ -640,7 +742,7 @@ server <- function(input, output, session) {
   output$native_causal_plot <- renderPlot({
     req(values$impact_results)
     
-    # Crear el gráfico nativo de CausalImpact
+    # Versión original que sabemos que funcionaba
     plot(values$impact_results)
   })
   
@@ -648,7 +750,7 @@ server <- function(input, output, session) {
   output$native_results_plot <- renderPlot({
     req(values$impact_results)
     
-    # Crear el gráfico nativo de CausalImpact
+    # Versión original que sabemos que funcionaba
     plot(values$impact_results)
   })
   
@@ -656,7 +758,7 @@ server <- function(input, output, session) {
   output$native_summary_plot <- renderPlot({
     req(values$impact_results)
     
-    # Crear el gráfico nativo de CausalImpact con título personalizado
+    # Versión original que sabemos que funcionaba
     plot(values$impact_results)
     title(main = paste("Análisis CausalImpact -", values$original_target_name),
           sub = paste("Intervención:", input$intervention_date))
@@ -883,22 +985,314 @@ server <- function(input, output, session) {
         .groups = 'drop'
       )
     
-    # Solo mostrar post-intervención para el gráfico de resumen
-    post_data <- summary_by_period[summary_by_period$period == "Post-intervención", ]
+    # Crear gráfico más informativo
+    p <- ggplot() +
+      geom_col(data = summary_by_period, aes(x = period, y = avg_expected, fill = "Esperado"), 
+               alpha = 0.7, width = 0.6) +
+      geom_col(data = summary_by_period, aes(x = period, y = avg_actual, fill = "Observado"), 
+               alpha = 0.9, width = 0.4) +
+      geom_text(data = summary_by_period, 
+                aes(x = period, y = avg_expected + max(avg_expected) * 0.05, 
+                    label = sprintf("%.4f", avg_expected)), 
+                vjust = -0.5, size = 3) +
+      geom_text(data = summary_by_period, 
+                aes(x = period, y = avg_actual + max(avg_actual) * 0.05, 
+                    label = sprintf("%.4f", avg_actual)), 
+                vjust = -0.5, size = 3) +
+      labs(title = "Comparación: Observado vs Esperado por Período",
+           y = paste("Promedio", values$original_target_name), x = "Período",
+           fill = "Tipo de Dato") +
+      scale_fill_manual(values = c("Esperado" = "lightblue", "Observado" = "darkblue")) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(size = 12),
+            legend.position = "bottom")
     
-    if (nrow(post_data) > 0) {
-      p <- ggplot() +
-        geom_col(data = post_data, aes(x = "Post-Intervención", y = avg_expected), 
-                 fill = "lightblue", alpha = 0.7, width = 0.5) +
-        geom_col(data = post_data, aes(x = "Post-Intervención", y = avg_actual), 
-                 fill = "darkblue", alpha = 0.9, width = 0.3) +
-        labs(title = "Comparación: Observado vs Esperado (Período Post-Intervención)",
-             y = paste("Promedio", values$original_target_name), x = "") +
-        theme_minimal() +
-        theme(axis.text.x = element_text(size = 12))
+    ggplotly(p)
+  })
+  
+  # ==========================================
+  # NUEVOS OUTPUTS PARA EL RESUMEN MEJORADO
+  # ==========================================
+  
+  # Métricas clave del impacto
+  output$key_impact_metrics <- renderTable({
+    req(values$impact_results)
+    
+    summary_data <- values$impact_results$summary
+    
+    metrics <- data.frame(
+      Métrica = c("Efecto absoluto promedio", "Efecto relativo promedio", "Efecto acumulativo"),
+      Valor = c(
+        round(summary_data$AbsEffect[1], 4),
+        paste0(round(summary_data$RelEffect[1] * 100, 2), "%"),
+        round(summary_data$AbsEffect[2], 4)
+      ),
+      IC_Inferior = c(
+        round(summary_data$AbsEffect.lower[1], 4),
+        paste0(round(summary_data$RelEffect.lower[1] * 100, 2), "%"),
+        round(summary_data$AbsEffect.lower[2], 4)
+      ),
+      IC_Superior = c(
+        round(summary_data$AbsEffect.upper[1], 4),
+        paste0(round(summary_data$RelEffect.upper[1] * 100, 2), "%"),
+        round(summary_data$AbsEffect.upper[2], 4)
+      )
+    )
+    
+    return(metrics)
+  })
+  
+  # Significancia estadística
+  output$statistical_significance <- renderText({
+    req(values$impact_results)
+    
+    summary_data <- values$impact_results$summary
+    p_value <- summary_data$p[1]
+    
+    if (p_value < 0.01) {
+      significance <- "altamente significativo (p < 0.01)"
+      color <- "success"
+      icon <- "✅"
+    } else if (p_value < 0.05) {
+      significance <- "significativo (p < 0.05)"
+      color <- "info"
+      icon <- "✅"
+    } else {
+      significance <- "no significativo (p > 0.05)"
+      color <- "warning"
+      icon <- "⚠️"
+    }
+    
+    html <- paste0(
+      "<div class='alert alert-", color, "'>",
+      "<h5>", icon, " Nivel de Significancia</h5>",
+      "<p><strong>p-value:</strong> ", round(p_value, 4), "</p>",
+      "<p><strong>Interpretación:</strong> ", significance, "</p>",
+      "</div>"
+    )
+    
+    return(html)
+  })
+  
+  # Impacto financiero estimado
+  output$financial_impact <- renderText({
+    req(values$impact_results)
+    
+    summary_data <- values$impact_results$summary
+    avg_effect <- summary_data$RelEffect[1]
+    
+    # Calcular días post-intervención
+    post_days <- sum(values$processed_results$period == "Post-intervención")
+    
+    # Estimación simple del impacto
+    if (avg_effect > 0) {
+      impact_type <- "positivo"
+      color <- "success"
+      icon <- "📈"
+    } else {
+      impact_type <- "negativo"
+      color <- "danger"
+      icon <- "📉"
+    }
+    
+    html <- paste0(
+      "<div class='alert alert-", color, "'>",
+      "<h5>", icon, " Impacto Estimado</h5>",
+      "<p><strong>Tipo:</strong> ", impact_type, "</p>",
+      "<p><strong>Días analizados:</strong> ", post_days, "</p>",
+      "<p><strong>Efecto promedio:</strong> ", round(avg_effect * 100, 2), "%</p>",
+      "</div>"
+    )
+    
+    return(html)
+  })
+  
+  # Tendencias pre-intervención
+  output$pre_trend_plot <- renderPlotly({
+    req(values$processed_results)
+    
+    pre_data <- values$processed_results[values$processed_results$period == "Pre-intervención", ]
+    
+    if (nrow(pre_data) > 0) {
+      p <- ggplot(pre_data, aes(x = time, y = actual)) +
+        geom_line(color = "darkgreen", size = 1) +
+        geom_smooth(method = "lm", color = "red", linetype = "dashed") +
+        labs(title = "Tendencia Pre-Intervención",
+             y = values$original_target_name, x = "Fecha") +
+        theme_minimal()
       
       ggplotly(p)
     }
+  })
+  
+  # Tendencias post-intervención
+  output$post_trend_plot <- renderPlotly({
+    req(values$processed_results)
+    
+    post_data <- values$processed_results[values$processed_results$period == "Post-intervención", ]
+    
+    if (nrow(post_data) > 0) {
+      p <- ggplot(post_data, aes(x = time, y = actual)) +
+        geom_line(color = "purple", size = 1) +
+        geom_smooth(method = "lm", color = "orange", linetype = "dashed") +
+        labs(title = "Tendencia Post-Intervención",
+             y = values$original_target_name, x = "Fecha") +
+        theme_minimal()
+      
+      ggplotly(p)
+    }
+  })
+  
+  # Resumen ejecutivo estructurado
+  output$structured_summary <- renderText({
+    req(values$impact_results)
+    
+    summary_data <- values$impact_results$summary
+    avg_effect <- round(summary_data$RelEffect[1] * 100, 2)
+    p_value <- summary_data$p[1]
+    
+    html <- paste0(
+      "<div class='well'>",
+      "<h5>📊 Resumen Ejecutivo</h5>",
+      "<p><strong>Objetivo:</strong> Analizar el impacto de la intervención del ", 
+      input$intervention_date, " en ", values$original_target_name, "</p>",
+      
+      "<h6>🎯 Resultados Principales:</h6>",
+      "<ul>",
+      "<li><strong>Efecto promedio:</strong> ", ifelse(avg_effect >= 0, "+", ""), avg_effect, "%</li>",
+      "<li><strong>Significancia:</strong> ", ifelse(p_value < 0.05, "Estadísticamente significativo", "No significativo"), "</li>",
+      "<li><strong>Confianza:</strong> ", input$confidence_level, "%</li>",
+      "</ul>",
+      
+      "<h6>📈 Interpretación:</h6>",
+      if (avg_effect > 0 && p_value < 0.05) {
+        "<p>✅ La intervención tuvo un impacto positivo y estadísticamente significativo.</p>"
+      } else if (avg_effect < 0 && p_value < 0.05) {
+        "<p>⚠️ La intervención tuvo un impacto negativo y estadísticamente significativo.</p>"
+      } else {
+        "<p>🤔 No se detectó un impacto estadísticamente significativo.</p>"
+      },
+      "</div>"
+    )
+    
+    return(html)
+  })
+  
+  # Recomendaciones
+  output$recommendations <- renderText({
+    req(values$impact_results)
+    
+    summary_data <- values$impact_results$summary
+    avg_effect <- summary_data$RelEffect[1]
+    p_value <- summary_data$p[1]
+    
+    if (avg_effect > 0 && p_value < 0.05) {
+      recommendations <- paste0(
+        "<div class='alert alert-success'>",
+        "<h6>🎯 Recomendaciones (Impacto Positivo):</h6>",
+        "<ul>",
+        "<li>✅ <strong>Mantener la intervención</strong> - Los resultados son positivos</li>",
+        "<li>📊 <strong>Monitorear continuamente</strong> - Seguir evaluando el impacto</li>",
+        "<li>🚀 <strong>Considerar escalar</strong> - La intervención es efectiva</li>",
+        "<li>📈 <strong>Optimizar</strong> - Buscar formas de mejorar aún más</li>",
+        "</ul>",
+        "</div>"
+      )
+    } else if (avg_effect < 0 && p_value < 0.05) {
+      recommendations <- paste0(
+        "<div class='alert alert-danger'>",
+        "<h6>🎯 Recomendaciones (Impacto Negativo):</h6>",
+        "<ul>",
+        "<li>⚠️ <strong>Revisar la intervención</strong> - Los resultados son negativos</li>",
+        "<li>🔄 <strong>Considerar cambios</strong> - Modificar el enfoque</li>",
+        "<li>⏸️ <strong>Pausar si es necesario</strong> - Evaluar antes de continuar</li>",
+        "<li>📋 <strong>Analizar causas</strong> - Entender qué salió mal</li>",
+        "</ul>",
+        "</div>"
+      )
+    } else {
+      recommendations <- paste0(
+        "<div class='alert alert-warning'>",
+        "<h6>🎯 Recomendaciones (Sin Impacto Significativo):</h6>",
+        "<ul>",
+        "<li>🤔 <strong>Evaluar la intervención</strong> - No hay evidencia clara de impacto</li>",
+        "<li>⏰ <strong>Dar más tiempo</strong> - El efecto puede tardar en manifestarse</li>",
+        "<li>📊 <strong>Mejorar el análisis</strong> - Considerar más variables o tiempo</li>",
+        "<li>🔄 <strong>Revisar el diseño</strong> - La intervención puede necesitar ajustes</li>",
+        "</ul>",
+        "</div>"
+      )
+    }
+    
+    return(recommendations)
+  })
+  
+  # Limitaciones y consideraciones
+  output$limitations <- renderText({
+    html <- paste0(
+      "<div class='alert alert-info'>",
+      "<h6>⚠️ Limitaciones y Consideraciones:</h6>",
+      "<ul>",
+      "<li><strong>Datos históricos:</strong> La calidad del análisis depende de la cantidad y calidad de datos pre-intervención</li>",
+      "<li><strong>Variables de control:</strong> El modelo asume que las variables de control capturan todos los factores externos</li>",
+      "<li><strong>Estacionalidad:</strong> Los patrones estacionales pueden afectar la precisión del contrafactual</li>",
+      "<li><strong>Intervenciones múltiples:</strong> Si hubo otras intervenciones simultáneas, pueden confundir los resultados</li>",
+      "<li><strong>Generalización:</strong> Los resultados pueden no ser aplicables a otros contextos o períodos</li>",
+      "</ul>",
+      "</div>"
+    )
+    
+    return(html)
+  })
+  
+  # Estabilidad del modelo
+  output$model_stability_plot <- renderPlotly({
+    req(values$processed_results)
+    
+    # Calcular residuos del modelo
+    residuals <- values$processed_results$actual - values$processed_results$expected
+    
+    p <- ggplot(data.frame(residuals = residuals, time = values$processed_results$time), 
+                aes(x = time, y = residuals)) +
+      geom_line(color = "steelblue", alpha = 0.7) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+      geom_smooth(method = "loess", color = "orange") +
+      labs(title = "Estabilidad del Modelo (Residuos)",
+           y = "Residuos", x = "Fecha") +
+      theme_minimal()
+    
+    ggplotly(p)
+  })
+  
+  # Comparación de períodos
+  output$period_comparison_plot <- renderPlotly({
+    req(values$processed_results)
+    
+    # Calcular estadísticas por período
+    period_stats <- values$processed_results %>%
+      group_by(period) %>%
+      summarise(
+        mean_val = mean(actual, na.rm = TRUE),
+        sd_val = sd(actual, na.rm = TRUE),
+        min_val = min(actual, na.rm = TRUE),
+        max_val = max(actual, na.rm = TRUE),
+        .groups = 'drop'
+      )
+    
+    # Crear gráfico de barras comparativo
+    p <- ggplot(period_stats, aes(x = period, y = mean_val, fill = period)) +
+      geom_col(alpha = 0.8) +
+      geom_errorbar(aes(ymin = mean_val - sd_val, ymax = mean_val + sd_val), 
+                    width = 0.2, color = "black") +
+      geom_text(aes(label = sprintf("%.4f", mean_val)), 
+                vjust = -0.5, size = 3) +
+      labs(title = "Comparación de Períodos",
+           y = paste("Promedio", values$original_target_name), x = "Período") +
+      scale_fill_manual(values = c("Pre-intervención" = "lightgreen", "Post-intervención" = "lightcoral")) +
+      theme_minimal() +
+      theme(legend.position = "none")
+    
+    ggplotly(p)
   })
   
   # ==========================================
@@ -930,9 +1324,22 @@ server <- function(input, output, session) {
         "body { font-family: Arial, sans-serif; margin: 40px; }",
         "h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }",
         "h2 { color: #34495e; margin-top: 30px; }",
+        "h3 { color: #2c3e50; margin-top: 25px; }",
         "pre { background-color: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }",
         ".config { background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }",
         ".narrative { background-color: #f0f8f0; padding: 15px; border-radius: 5px; margin: 20px 0; }",
+        ".metrics { background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; }",
+        ".insights { background-color: #d1ecf1; padding: 15px; border-radius: 5px; margin: 20px 0; }",
+        ".recommendations { background-color: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0; }",
+        ".limitations { background-color: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0; }",
+        "table { border-collapse: collapse; width: 100%; margin: 20px 0; }",
+        "th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }",
+        "th { background-color: #f2f2f2; }",
+        ".alert { padding: 15px; margin: 20px 0; border-radius: 5px; }",
+        ".alert-success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }",
+        ".alert-info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }",
+        ".alert-warning { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }",
+        ".alert-danger { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }",
         "</style>",
         "</head>",
         "<body>",
@@ -956,9 +1363,103 @@ server <- function(input, output, session) {
         "<pre>", paste(capture.output(summary(values$impact_results, "report")), collapse = "\n"), "</pre>",
         "</div>",
         
-        "<h2>📈 Interpretación</h2>",
+        "<div class='metrics'>",
+        "<h2>📈 Métricas Clave del Impacto</h2>",
+        "<h3>🎯 Efectos Principales</h3>",
+        "<table>",
+        "<tr><th>Métrica</th><th>Valor</th><th>IC Inferior</th><th>IC Superior</th></tr>",
+        "<tr><td>Efecto absoluto promedio</td><td>", round(values$impact_results$summary$AbsEffect[1], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.lower[1], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.upper[1], 4), "</td></tr>",
+        "<tr><td>Efecto relativo promedio</td><td>", round(values$impact_results$summary$RelEffect[1] * 100, 2), "%</td><td>", round(values$impact_results$summary$RelEffect.lower[1] * 100, 2), "%</td><td>", round(values$impact_results$summary$RelEffect.upper[1] * 100, 2), "%</td></tr>",
+        "<tr><td>Efecto acumulativo</td><td>", round(values$impact_results$summary$AbsEffect[2], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.lower[2], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.upper[2], 4), "</td></tr>",
+        "</table>",
+        
+        "<h3>📊 Significancia Estadística</h3>",
+        "<p><strong>p-value:</strong> ", round(values$impact_results$summary$p[1], 4), "</p>",
+        "<p><strong>Interpretación:</strong> ", 
+        if (values$impact_results$summary$p[1] < 0.01) {
+          "Altamente significativo (p < 0.01)"
+        } else if (values$impact_results$summary$p[1] < 0.05) {
+          "Significativo (p < 0.05)"
+        } else {
+          "No significativo (p > 0.05)"
+        }, "</p>",
+        
+        "<h3>💰 Impacto Estimado</h3>",
+        "<p><strong>Tipo:</strong> ", ifelse(values$impact_results$summary$RelEffect[1] > 0, "Positivo", "Negativo"), "</p>",
+        "<p><strong>Días analizados post-intervención:</strong> ", sum(values$processed_results$period == "Post-intervención"), "</p>",
+        "<p><strong>Efecto promedio:</strong> ", round(values$impact_results$summary$RelEffect[1] * 100, 2), "%</p>",
+        "</div>",
+        
+        "<div class='insights'>",
+        "<h2>🔍 Insights Detallados</h2>",
+        "<h3>📋 Resumen Ejecutivo Estructurado</h3>",
+        "<p><strong>Objetivo:</strong> Analizar el impacto de la intervención del ", input$intervention_date, " en ", values$original_target_name, "</p>",
+        "<h4>🎯 Resultados Principales:</h4>",
+        "<ul>",
+        "<li><strong>Efecto promedio:</strong> ", ifelse(round(values$impact_results$summary$RelEffect[1] * 100, 2) >= 0, "+", ""), round(values$impact_results$summary$RelEffect[1] * 100, 2), "%</li>",
+        "<li><strong>Significancia:</strong> ", ifelse(values$impact_results$summary$p[1] < 0.05, "Estadísticamente significativo", "No significativo"), "</li>",
+        "<li><strong>Confianza:</strong> ", input$confidence_level, "%</li>",
+        "</ul>",
+        "<h4>📈 Interpretación:</h4>",
+        if (values$impact_results$summary$RelEffect[1] > 0 && values$impact_results$summary$p[1] < 0.05) {
+          "<p>✅ La intervención tuvo un impacto positivo y estadísticamente significativo.</p>"
+        } else if (values$impact_results$summary$RelEffect[1] < 0 && values$impact_results$summary$p[1] < 0.05) {
+          "<p>⚠️ La intervención tuvo un impacto negativo y estadísticamente significativo.</p>"
+        } else {
+          "<p>🤔 No se detectó un impacto estadísticamente significativo.</p>"
+        },
+        "</div>",
+        
+        "<div class='recommendations'>",
+        "<h2>🎯 Recomendaciones</h2>",
+        if (values$impact_results$summary$RelEffect[1] > 0 && values$impact_results$summary$p[1] < 0.05) {
+          paste0(
+            "<h3>🎯 Recomendaciones (Impacto Positivo):</h3>",
+            "<ul>",
+            "<li>✅ <strong>Mantener la intervención</strong> - Los resultados son positivos</li>",
+            "<li>📊 <strong>Monitorear continuamente</strong> - Seguir evaluando el impacto</li>",
+            "<li>🚀 <strong>Considerar escalar</strong> - La intervención es efectiva</li>",
+            "<li>📈 <strong>Optimizar</strong> - Buscar formas de mejorar aún más</li>",
+            "</ul>"
+          )
+        } else if (values$impact_results$summary$RelEffect[1] < 0 && values$impact_results$summary$p[1] < 0.05) {
+          paste0(
+            "<h3>🎯 Recomendaciones (Impacto Negativo):</h3>",
+            "<ul>",
+            "<li>⚠️ <strong>Revisar la intervención</strong> - Los resultados son negativos</li>",
+            "<li>🔄 <strong>Considerar cambios</strong> - Modificar el enfoque</li>",
+            "<li>⏸️ <strong>Pausar si es necesario</strong> - Evaluar antes de continuar</li>",
+            "<li>📋 <strong>Analizar causas</strong> - Entender qué salió mal</li>",
+            "</ul>"
+          )
+        } else {
+          paste0(
+            "<h3>🎯 Recomendaciones (Sin Impacto Significativo):</h3>",
+            "<ul>",
+            "<li>🤔 <strong>Evaluar la intervención</strong> - No hay evidencia clara de impacto</li>",
+            "<li>⏰ <strong>Dar más tiempo</strong> - El efecto puede tardar en manifestarse</li>",
+            "<li>📊 <strong>Mejorar el análisis</strong> - Considerar más variables o tiempo</li>",
+            "<li>🔄 <strong>Revisar el diseño</strong> - La intervención puede necesitar ajustes</li>",
+            "</ul>"
+          )
+        },
+        "</div>",
+        
+        "<div class='limitations'>",
+        "<h2>⚠️ Limitaciones y Consideraciones</h2>",
+        "<ul>",
+        "<li><strong>Datos históricos:</strong> La calidad del análisis depende de la cantidad y calidad de datos pre-intervención</li>",
+        "<li><strong>Variables de control:</strong> El modelo asume que las variables de control capturan todos los factores externos</li>",
+        "<li><strong>Estacionalidad:</strong> Los patrones estacionales pueden afectar la precisión del contrafactual</li>",
+        "<li><strong>Intervenciones múltiples:</strong> Si hubo otras intervenciones simultáneas, pueden confundir los resultados</li>",
+        "<li><strong>Generalización:</strong> Los resultados pueden no ser aplicables a otros contextos o períodos</li>",
+        "</ul>",
+        "</div>",
+        
+        "<h2>📈 Información Adicional</h2>",
         "<p>Este reporte fue generado automáticamente por la aplicación Shiny de Análisis Causal Impact.</p>",
         "<p><strong>Fecha de generación:</strong> ", Sys.time(), "</p>",
+        "<p><strong>Nota:</strong> Los gráficos interactivos no se incluyen en este reporte HTML. Para visualizaciones completas, use la aplicación Shiny.</p>",
         
         "</body></html>"
       )
