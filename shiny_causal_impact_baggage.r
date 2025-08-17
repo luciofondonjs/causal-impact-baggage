@@ -154,9 +154,9 @@ ui <- dashboardPage(
                                          choices = NULL),
                              
                              div(style = "position: relative; z-index: 1000;",
-                                 dateInput("intervention_date",
-                                           "📅 Fecha de intervención:",
-                                           value = Sys.Date(),
+                             dateInput("intervention_date",
+                                       "📅 Fecha de intervención:",
+                                       value = Sys.Date(),
                                            format = "yyyy-mm-dd",
                                            language = "es",
                                            weekstart = 1,
@@ -164,9 +164,9 @@ ui <- dashboardPage(
                              ),
                              
                              div(style = "position: relative; z-index: 1000;",
-                                 dateInput("pre_start",
-                                           "📅 Inicio período pre-intervención:",
-                                           value = Sys.Date() - 90,
+                             dateInput("pre_start",
+                                       "📅 Inicio período pre-intervención:",
+                                       value = Sys.Date() - 90,
                                            format = "yyyy-mm-dd",
                                            language = "es",
                                            weekstart = 1,
@@ -174,9 +174,9 @@ ui <- dashboardPage(
                              ),
                              
                              div(style = "position: relative; z-index: 1000;",
-                                 dateInput("post_end",
-                                           "📅 Fin período post-intervención:",
-                                           value = Sys.Date() + 30,
+                             dateInput("post_end",
+                                       "📅 Fin período post-intervención:",
+                                       value = Sys.Date() + 30,
                                            format = "yyyy-mm-dd",
                                            language = "es",
                                            weekstart = 1,
@@ -206,8 +206,8 @@ ui <- dashboardPage(
                     ),
                     
                     br(),
-                    
-                    conditionalPanel(
+                      
+                      conditionalPanel(
                       condition = "output.config_ready",
                       div(
                         class = "alert alert-info",
@@ -427,43 +427,28 @@ ui <- dashboardPage(
               conditionalPanel(
                 condition = "output.analysis_complete",
                 
+                # Simplificado al máximo - Solo resumen y gráfico
                 fluidRow(
                   box(
                     title = "📋 Resumen Ejecutivo", 
-                    status = "success", 
+                    status = "primary", 
                     solidHeader = TRUE, 
                     width = 12,
                     
-                    h3("🎯 Resumen del Análisis Causal Impact"),
-                    
+                    h3("🎯 Análisis CausalImpact - Resultados Clave"),
                     htmlOutput("executive_summary"),
                     
-                    br(),
+                    # Tabla de métricas principales
+                    h4("📊 Métricas Principales"),
+                    tableOutput("key_impact_metrics"),
                     
-                    h4("📊 Gráfico Nativo CausalImpact - Resumen"),
-                    p("Este es el gráfico estándar generado por la librería CausalImpact con 3 paneles: original, pointwise y cumulative."),
-                    plotOutput("native_summary_plot"),
+                    # Significancia estadística
+                    h4("📈 Significancia Estadística"),
+                    htmlOutput("statistical_significance"),
                     
-                    br(),
-                    
-                    h4("🔍 Debug Info (Verificar datos)"),
-                    verbatimTextOutput("debug_info"),
-                    
-                    br(),
-                    
-                    h4("📈 Reporte Narrativo CausalImpact (Oficial)"),
-                    p("Este es el reporte automático generado por la librería CausalImpact:"),
-                    verbatimTextOutput("causal_impact_report"),
-                    
-                    br(),
-                    
-                    h4("📊 Gráfico de Resumen Personalizado"),
-                    plotlyOutput("summary_plot", height = "400px"),
-                    
-                    br(),
-                    
+                    # Botón de descarga
                     div(
-                      style = "text-align: center;",
+                      style = "text-align: center; margin: 20px 0;",
                       downloadButton("download_report", 
                                      "📥 Descargar Reporte Completo (HTML)", 
                                      class = "btn-success btn-lg")
@@ -471,87 +456,17 @@ ui <- dashboardPage(
                   )
                 ),
                 
-                # Nuevos insights y métricas
+                # Gráfico CausalImpact - Simplificado al máximo
                 fluidRow(
                   box(
-                    title = "📈 Métricas Clave del Impacto", 
-                    status = "info", 
-                    solidHeader = TRUE, 
-                    width = 6,
-                    
-                    h4("🎯 Efectos Principales"),
-                    tableOutput("key_impact_metrics"),
-                    
-                    br(),
-                    
-                    h4("📊 Significancia Estadística"),
-                    htmlOutput("statistical_significance"),
-                    
-                    br(),
-                    
-                    h4("💰 Impacto Financiero Estimado"),
-                    htmlOutput("financial_impact")
-                  ),
-                  
-                  box(
-                    title = "📊 Análisis de Tendencias", 
-                    status = "info", 
-                    solidHeader = TRUE, 
-                    width = 6,
-                    
-                    h4("📈 Tendencias Pre-Intervención"),
-                    plotlyOutput("pre_trend_plot", height = "200px"),
-                    
-                    br(),
-                    
-                    h4("📈 Tendencias Post-Intervención"),
-                    plotlyOutput("post_trend_plot", height = "200px")
-                  )
-                ),
-                
-                # Insights adicionales
-                fluidRow(
-                  box(
-                    title = "🔍 Insights Detallados", 
-                    status = "primary", 
+                    title = "📊 Gráfico CausalImpact", 
+                    status = "success", 
                     solidHeader = TRUE, 
                     width = 12,
                     
-                    h4("📋 Resumen Ejecutivo Estructurado"),
-                    htmlOutput("structured_summary"),
-                    
-                    br(),
-                    
-                    h4("🎯 Recomendaciones"),
-                    htmlOutput("recommendations"),
-                    
-                    br(),
-                    
-                    h4("⚠️ Limitaciones y Consideraciones"),
-                    htmlOutput("limitations")
-                  )
-                ),
-                
-                # Gráficos adicionales
-                fluidRow(
-                  box(
-                    title = "📊 Análisis de Estabilidad", 
-                    status = "warning", 
-                    solidHeader = TRUE, 
-                    width = 6,
-                    
-                    h4("📈 Estabilidad del Modelo"),
-                    plotlyOutput("model_stability_plot", height = "300px")
-                  ),
-                  
-                  box(
-                    title = "📊 Comparación de Períodos", 
-                    status = "warning", 
-                    solidHeader = TRUE, 
-                    width = 6,
-                    
-                    h4("📈 Comparación Pre vs Post"),
-                    plotlyOutput("period_comparison_plot", height = "300px")
+                    # Intentamos con una altura explícita y ancho completo
+                    div(style="height:700px; width:100%; overflow:visible;",
+                        plotOutput("native_summary_plot", height = "600px", width = "100%"))
                   )
                 )
               )
@@ -689,8 +604,24 @@ server <- function(input, output, session) {
       # Ejecutar Causal Impact
       alpha <- (100 - input$confidence_level) / 100
       
-      # Versión simple y directa como estaba originalmente
+      # Asegurar que todos los datos sean numéricos
+      tryCatch({
+        # Verificar y convertir a numérico si es necesario
+        numeric_data <- coredata(data_zoo)
+        numeric_data <- apply(numeric_data, 2, function(x) {
+          # Convertir a numérico con manejo de errores
+          as.numeric(as.character(x))
+        })
+        
+        # Crear nuevo objeto zoo con datos numéricos validados
+        clean_zoo <- zoo(numeric_data, order.by = index(data_zoo))
+        
+        # Ejecutar CausalImpact con datos limpios
+        values$impact_results <- CausalImpact(clean_zoo, pre.period, post.period, alpha = alpha)
+      }, error = function(e) {
+        # Si hay error en la conversión, intentar con los datos originales
       values$impact_results <- CausalImpact(data_zoo, pre.period, post.period, alpha = alpha)
+      })
       
       # Procesar resultados para visualización
       results_df <- data.frame(
@@ -743,6 +674,7 @@ server <- function(input, output, session) {
     req(values$impact_results)
     
     # Versión original que sabemos que funcionaba
+    par(mar = c(5, 4, 4, 2))  # Asegurar márgenes adecuados
     plot(values$impact_results)
   })
   
@@ -754,15 +686,14 @@ server <- function(input, output, session) {
     plot(values$impact_results)
   })
   
-  # Gráfico nativo de CausalImpact (pestaña Resumen)
+  # Gráfico nativo de CausalImpact (pestaña Resumen) - EXACTAMENTE igual al de Análisis
   output$native_summary_plot <- renderPlot({
     req(values$impact_results)
     
-    # Versión original que sabemos que funcionaba
+    # Versión original que sabemos que funcionaba en la pestaña Análisis
+    par(mar = c(5, 4, 4, 2))  # Asegurar márgenes adecuados
     plot(values$impact_results)
-    title(main = paste("Análisis CausalImpact -", values$original_target_name),
-          sub = paste("Intervención:", input$intervention_date))
-  }, height = 500, width = 800)
+  })
   
   # Gráfico principal personalizado
   output$main_plot <- renderPlotly({
@@ -986,7 +917,7 @@ server <- function(input, output, session) {
       )
     
     # Crear gráfico más informativo
-    p <- ggplot() +
+      p <- ggplot() +
       geom_col(data = summary_by_period, aes(x = period, y = avg_expected, fill = "Esperado"), 
                alpha = 0.7, width = 0.6) +
       geom_col(data = summary_by_period, aes(x = period, y = avg_actual, fill = "Observado"), 
@@ -1003,11 +934,11 @@ server <- function(input, output, session) {
            y = paste("Promedio", values$original_target_name), x = "Período",
            fill = "Tipo de Dato") +
       scale_fill_manual(values = c("Esperado" = "lightblue", "Observado" = "darkblue")) +
-      theme_minimal() +
+        theme_minimal() +
       theme(axis.text.x = element_text(size = 12),
             legend.position = "bottom")
-    
-    ggplotly(p)
+      
+      ggplotly(p)
   })
   
   # ==========================================
@@ -1309,151 +1240,121 @@ server <- function(input, output, session) {
     }
   )
   
+  # Función para capturar el gráfico como PNG y convertirlo a base64
+  get_plot_base64 <- function() {
+    # Crear un archivo temporal para guardar el gráfico
+    tmp <- tempfile(fileext = ".png")
+    
+    # Guardar el gráfico en el archivo temporal
+    png(tmp, width = 800, height = 600, res = 100)
+    
+    # Usar el mismo enfoque simple que funciona en la pestaña Análisis
+    tryCatch({
+      req(values$impact_results)
+      par(mar = c(5, 4, 4, 2))  # Asegurar márgenes adecuados
+      plot(values$impact_results)
+    }, error = function(e) {
+      # Si hay error, mostrar mensaje informativo
+      plot(0, 0, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(0, 1), ylim = c(0, 1))
+      text(0.5, 0.5, "No se pudo generar el gráfico", col = "red")
+    }, finally = {
+      dev.off()
+    })
+    
+    # Convertir el PNG a base64
+    base64 <- base64enc::base64encode(tmp)
+    
+    # Eliminar el archivo temporal
+    unlink(tmp)
+    
+    # Devolver la cadena base64
+    return(base64)
+  }
+  
   # Descargar reporte HTML
   output$download_report <- downloadHandler(
     filename = function() {
       paste0("causal_impact_report_", Sys.Date(), ".html")
     },
     content = function(file) {
-      # Generar reporte HTML completo
+      # Obtener el gráfico como base64
+      plot_base64 <- get_plot_base64()
+      
+      # Generar reporte HTML simplificado
       html_content <- paste0(
         "<html>",
         "<head>",
-        "<title>Reporte Completo Causal Impact</title>",
+        "<title>Reporte Causal Impact</title>",
         "<style>",
-        "body { font-family: Arial, sans-serif; margin: 40px; }",
-        "h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }",
-        "h2 { color: #34495e; margin-top: 30px; }",
+        "body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }",
+        "h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }",
+        "h2 { color: #34495e; margin-top: 30px; border-left: 4px solid #3498db; padding-left: 10px; }",
         "h3 { color: #2c3e50; margin-top: 25px; }",
         "pre { background-color: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }",
-        ".config { background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }",
-        ".narrative { background-color: #f0f8f0; padding: 15px; border-radius: 5px; margin: 20px 0; }",
-        ".metrics { background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; }",
-        ".insights { background-color: #d1ecf1; padding: 15px; border-radius: 5px; margin: 20px 0; }",
-        ".recommendations { background-color: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0; }",
-        ".limitations { background-color: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0; }",
+        ".section { background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #3498db; }",
         "table { border-collapse: collapse; width: 100%; margin: 20px 0; }",
         "th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }",
         "th { background-color: #f2f2f2; }",
-        ".alert { padding: 15px; margin: 20px 0; border-radius: 5px; }",
-        ".alert-success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }",
-        ".alert-info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }",
-        ".alert-warning { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }",
-        ".alert-danger { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }",
+        ".significant { color: #28a745; font-weight: bold; }",
+        ".not-significant { color: #dc3545; font-weight: bold; }",
+        ".impact-positive { color: #28a745; }",
+        ".impact-negative { color: #dc3545; }",
         "</style>",
         "</head>",
         "<body>",
-        "<h1>🚀 Reporte Completo - Análisis Causal Impact</h1>",
+        "<h1>📊 Análisis Causal Impact - Resumen Ejecutivo</h1>",
         
-        "<div class='config'>",
-        "<h2>⚙️ Configuración del Análisis</h2>",
+        "<div class='section'>",
+        "<h2>⚙️ Información del Análisis</h2>",
         "<p><strong>Variable objetivo:</strong> ", values$original_target_name, "</p>",
         "<p><strong>Variables de control:</strong> ", paste(values$original_control_names, collapse = ", "), "</p>",
         "<p><strong>Fecha de intervención:</strong> ", input$intervention_date, "</p>",
-        "<p><strong>Período pre-intervención:</strong> ", input$pre_start, " a ", as.Date(input$intervention_date) - 1, "</p>",
-        "<p><strong>Período post-intervención:</strong> ", input$intervention_date, " a ", input$post_end, "</p>",
+        "<p><strong>Período analizado:</strong> ", input$pre_start, " a ", input$post_end, "</p>",
         "<p><strong>Nivel de confianza:</strong> ", input$confidence_level, "%</p>",
         "</div>",
         
-        "<h2>📊 Resumen Estadístico</h2>",
-        "<pre>", paste(capture.output(summary(values$impact_results)), collapse = "\n"), "</pre>",
+        "<div class='section'>",
+        "<h2>📊 Resultados Principales</h2>",
         
-        "<div class='narrative'>",
-        "<h2>📝 Reporte Narrativo Oficial (CausalImpact)</h2>",
-        "<pre>", paste(capture.output(summary(values$impact_results, "report")), collapse = "\n"), "</pre>",
-        "</div>",
-        
-        "<div class='metrics'>",
-        "<h2>📈 Métricas Clave del Impacto</h2>",
-        "<h3>🎯 Efectos Principales</h3>",
         "<table>",
         "<tr><th>Métrica</th><th>Valor</th><th>IC Inferior</th><th>IC Superior</th></tr>",
         "<tr><td>Efecto absoluto promedio</td><td>", round(values$impact_results$summary$AbsEffect[1], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.lower[1], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.upper[1], 4), "</td></tr>",
-        "<tr><td>Efecto relativo promedio</td><td>", round(values$impact_results$summary$RelEffect[1] * 100, 2), "%</td><td>", round(values$impact_results$summary$RelEffect.lower[1] * 100, 2), "%</td><td>", round(values$impact_results$summary$RelEffect.upper[1] * 100, 2), "%</td></tr>",
+        "<tr><td>Efecto relativo promedio</td><td class='", ifelse(values$impact_results$summary$RelEffect[1] > 0, "impact-positive", "impact-negative"), "'>", ifelse(values$impact_results$summary$RelEffect[1] > 0, "+", ""), round(values$impact_results$summary$RelEffect[1] * 100, 2), "%</td><td>", round(values$impact_results$summary$RelEffect.lower[1] * 100, 2), "%</td><td>", round(values$impact_results$summary$RelEffect.upper[1] * 100, 2), "%</td></tr>",
         "<tr><td>Efecto acumulativo</td><td>", round(values$impact_results$summary$AbsEffect[2], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.lower[2], 4), "</td><td>", round(values$impact_results$summary$AbsEffect.upper[2], 4), "</td></tr>",
         "</table>",
         
         "<h3>📊 Significancia Estadística</h3>",
-        "<p><strong>p-value:</strong> ", round(values$impact_results$summary$p[1], 4), "</p>",
-        "<p><strong>Interpretación:</strong> ", 
+        "<p><strong>p-value:</strong> <span class='", ifelse(values$impact_results$summary$p[1] < 0.05, "significant", "not-significant"), "'>", round(values$impact_results$summary$p[1], 4), "</span></p>",
+        "<p><strong>Interpretación:</strong> <span class='", ifelse(values$impact_results$summary$p[1] < 0.05, "significant", "not-significant"), "'>", 
         if (values$impact_results$summary$p[1] < 0.01) {
           "Altamente significativo (p < 0.01)"
         } else if (values$impact_results$summary$p[1] < 0.05) {
           "Significativo (p < 0.05)"
         } else {
           "No significativo (p > 0.05)"
-        }, "</p>",
+        }, "</span></p>",
         
-        "<h3>💰 Impacto Estimado</h3>",
-        "<p><strong>Tipo:</strong> ", ifelse(values$impact_results$summary$RelEffect[1] > 0, "Positivo", "Negativo"), "</p>",
-        "<p><strong>Días analizados post-intervención:</strong> ", sum(values$processed_results$period == "Post-intervención"), "</p>",
-        "<p><strong>Efecto promedio:</strong> ", round(values$impact_results$summary$RelEffect[1] * 100, 2), "%</p>",
-        "</div>",
-        
-        "<div class='insights'>",
-        "<h2>🔍 Insights Detallados</h2>",
-        "<h3>📋 Resumen Ejecutivo Estructurado</h3>",
-        "<p><strong>Objetivo:</strong> Analizar el impacto de la intervención del ", input$intervention_date, " en ", values$original_target_name, "</p>",
-        "<h4>🎯 Resultados Principales:</h4>",
-        "<ul>",
-        "<li><strong>Efecto promedio:</strong> ", ifelse(round(values$impact_results$summary$RelEffect[1] * 100, 2) >= 0, "+", ""), round(values$impact_results$summary$RelEffect[1] * 100, 2), "%</li>",
-        "<li><strong>Significancia:</strong> ", ifelse(values$impact_results$summary$p[1] < 0.05, "Estadísticamente significativo", "No significativo"), "</li>",
-        "<li><strong>Confianza:</strong> ", input$confidence_level, "%</li>",
-        "</ul>",
-        "<h4>📈 Interpretación:</h4>",
+        "<h3>💡 Interpretación</h3>",
         if (values$impact_results$summary$RelEffect[1] > 0 && values$impact_results$summary$p[1] < 0.05) {
-          "<p>✅ La intervención tuvo un impacto positivo y estadísticamente significativo.</p>"
+          "<p>✅ La intervención tuvo un <strong>impacto positivo</strong> y estadísticamente significativo.</p>"
         } else if (values$impact_results$summary$RelEffect[1] < 0 && values$impact_results$summary$p[1] < 0.05) {
-          "<p>⚠️ La intervención tuvo un impacto negativo y estadísticamente significativo.</p>"
+          "<p>⚠️ La intervención tuvo un <strong>impacto negativo</strong> y estadísticamente significativo.</p>"
         } else {
-          "<p>🤔 No se detectó un impacto estadísticamente significativo.</p>"
+          "<p>🤔 No se detectó un impacto estadísticamente significativo en la variable objetivo.</p>"
         },
         "</div>",
         
-        "<div class='recommendations'>",
-        "<h2>🎯 Recomendaciones</h2>",
-        if (values$impact_results$summary$RelEffect[1] > 0 && values$impact_results$summary$p[1] < 0.05) {
-          paste0(
-            "<h3>🎯 Recomendaciones (Impacto Positivo):</h3>",
-            "<ul>",
-            "<li>✅ <strong>Mantener la intervención</strong> - Los resultados son positivos</li>",
-            "<li>📊 <strong>Monitorear continuamente</strong> - Seguir evaluando el impacto</li>",
-            "<li>🚀 <strong>Considerar escalar</strong> - La intervención es efectiva</li>",
-            "<li>📈 <strong>Optimizar</strong> - Buscar formas de mejorar aún más</li>",
-            "</ul>"
-          )
-        } else if (values$impact_results$summary$RelEffect[1] < 0 && values$impact_results$summary$p[1] < 0.05) {
-          paste0(
-            "<h3>🎯 Recomendaciones (Impacto Negativo):</h3>",
-            "<ul>",
-            "<li>⚠️ <strong>Revisar la intervención</strong> - Los resultados son negativos</li>",
-            "<li>🔄 <strong>Considerar cambios</strong> - Modificar el enfoque</li>",
-            "<li>⏸️ <strong>Pausar si es necesario</strong> - Evaluar antes de continuar</li>",
-            "<li>📋 <strong>Analizar causas</strong> - Entender qué salió mal</li>",
-            "</ul>"
-          )
-        } else {
-          paste0(
-            "<h3>🎯 Recomendaciones (Sin Impacto Significativo):</h3>",
-            "<ul>",
-            "<li>🤔 <strong>Evaluar la intervención</strong> - No hay evidencia clara de impacto</li>",
-            "<li>⏰ <strong>Dar más tiempo</strong> - El efecto puede tardar en manifestarse</li>",
-            "<li>📊 <strong>Mejorar el análisis</strong> - Considerar más variables o tiempo</li>",
-            "<li>🔄 <strong>Revisar el diseño</strong> - La intervención puede necesitar ajustes</li>",
-            "</ul>"
-          )
-        },
+        "<div class='section'>",
+        "<h2>📊 Gráfico CausalImpact</h2>",
+        "<p>Este gráfico muestra los resultados del análisis con tres paneles: original, pointwise y cumulative:</p>",
+        "<div style='text-align: center; margin: 20px 0;'>",
+        "<img src='data:image/png;base64,", plot_base64, "' style='max-width: 100%; height: auto;' alt='Gráfico CausalImpact'>",
+        "</div>",
         "</div>",
         
-        "<div class='limitations'>",
-        "<h2>⚠️ Limitaciones y Consideraciones</h2>",
-        "<ul>",
-        "<li><strong>Datos históricos:</strong> La calidad del análisis depende de la cantidad y calidad de datos pre-intervención</li>",
-        "<li><strong>Variables de control:</strong> El modelo asume que las variables de control capturan todos los factores externos</li>",
-        "<li><strong>Estacionalidad:</strong> Los patrones estacionales pueden afectar la precisión del contrafactual</li>",
-        "<li><strong>Intervenciones múltiples:</strong> Si hubo otras intervenciones simultáneas, pueden confundir los resultados</li>",
-        "<li><strong>Generalización:</strong> Los resultados pueden no ser aplicables a otros contextos o períodos</li>",
-        "</ul>",
+        "<div class='section'>",
+        "<h2>📝 Reporte Narrativo Oficial</h2>",
+        "<pre>", paste(capture.output(summary(values$impact_results, "report")), collapse = "\n"), "</pre>",
         "</div>",
         
         "<h2>📈 Información Adicional</h2>",
